@@ -2,3 +2,8 @@
 **/target
 Cargo.lock
 .DS_Store
+.testnet/
+.env
+**/.env.local
+!dia-3/Cargo.lock
+dia-3/test_snapshots/

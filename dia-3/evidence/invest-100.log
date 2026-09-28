@@ -1,0 +1,12 @@
+
+=== INVERSIONISTA: invest 100 ===
+Contrato: CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532
+Inversionista: GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR
+$ stellar contract invoke --id CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532 --source rwa-investor --network testnet -- invest --investor GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR --payment_amount 100
+❌ error: transaction simulation failed: HostError: Error(Contract, #7)
+
+Event log (newest first):
+   0: [Diagnostic Event] contract:CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532, topics:[error, Error(Contract, #7)], data:"escalating error to VM trap from failed host function call: fail_with_error"
+   1: [Diagnostic Event] contract:CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532, topics:[error, Error(Contract, #7)], data:["failing with contract error", 7]
+   2: [Diagnostic Event] topics:[fn_call, CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532, invest], data:[GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR, 100]
+

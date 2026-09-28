@@ -2,7 +2,7 @@
 use soroban_sdk::{
     auth::{ContractContext, InvokerContractAuthEntry, SubContractInvocation},
     contract, contracterror, contractimpl, contracttype, panic_with_error, symbol_short, token,
-    Address, Env, IntoVal, Symbol, Vec, vec,
+    vec, Address, Env, IntoVal, Symbol, Vec,
 };
 
 #[contracttype]
@@ -32,7 +32,12 @@ pub enum Error {
     InvalidAmount = 4,
     NotWhitelisted = 5,
     Paused = 6,
+    AmountTooLow = 7,
+    Unauthorized = 8,
 }
+
+// Unidades enteras mínimas del token, igual que payment_amount y price_per_unit.
+const MIN_INVESTMENT: i128 = 500;
 
 #[contract]
 pub struct RwaLaunchpad;
@@ -45,11 +50,7 @@ impl RwaLaunchpad {
     }
 
     fn require_not_paused(env: &Env) {
-        let asset: AssetInfo = env
-            .storage()
-            .instance()
-            .get(&DataKey::AssetInfo)
-            .unwrap();
+        let asset: AssetInfo = env.storage().instance().get(&DataKey::AssetInfo).unwrap();
         if asset.paused {
             panic_with_error!(env, Error::Paused);
         }
@@ -75,10 +76,25 @@ impl RwaLaunchpad {
             .unwrap_or(false)
     }
 
-    // Paste your team's Day 2 variación logic here. Default: no extra gate.
-    fn check_variation_gate(env: &Env, investor: &Address) -> Result<(), Error> {
+    fn check_variation_gate(
+        env: &Env,
+        investor: &Address,
+        payment_amount: i128,
+    ) -> Result<(), Error> {
         let _ = (env, investor);
+        if payment_amount < MIN_INVESTMENT {
+            return Err(Error::AmountTooLow);
+        }
         Ok(())
+    }
+
+    fn require_admin(env: &Env, admin: &Address) {
+        Self::require_initialized(env);
+        let stored: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        if *admin != stored {
+            panic_with_error!(env, Error::Unauthorized);
+        }
+        admin.require_auth();
     }
 
     fn internal_mint(env: &Env, to: &Address, amount: i128) {
@@ -93,6 +109,7 @@ impl RwaLaunchpad {
         if env.storage().instance().has(&DataKey::Admin) {
             panic_with_error!(&env, Error::AlreadyInitialized);
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::AssetInfo, &asset);
     }
@@ -103,16 +120,14 @@ impl RwaLaunchpad {
     }
 
     pub fn mint(env: Env, admin: Address, to: Address, amount: i128) {
-        Self::require_initialized(&env);
-        admin.require_auth();
+        Self::require_admin(&env, &admin);
         Self::require_not_paused(&env);
         if amount <= 0 {
             panic_with_error!(&env, Error::InvalidAmount);
         }
 
         Self::internal_mint(&env, &to, amount);
-        env.events()
-            .publish((symbol_short!("mint"),), (to, amount));
+        env.events().publish((symbol_short!("mint"),), (to, amount));
     }
 
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
@@ -136,33 +151,22 @@ impl RwaLaunchpad {
     }
 
     pub fn set_whitelist(env: Env, admin: Address, investor: Address, approved: bool) {
-        Self::require_initialized(&env);
-        admin.require_auth();
+        Self::require_admin(&env, &admin);
         env.storage()
             .persistent()
             .set(&DataKey::Whitelisted(investor), &approved);
     }
 
     pub fn pause(env: Env, admin: Address) {
-        Self::require_initialized(&env);
-        admin.require_auth();
-        let mut asset: AssetInfo = env
-            .storage()
-            .instance()
-            .get(&DataKey::AssetInfo)
-            .unwrap();
+        Self::require_admin(&env, &admin);
+        let mut asset: AssetInfo = env.storage().instance().get(&DataKey::AssetInfo).unwrap();
         asset.paused = true;
         env.storage().instance().set(&DataKey::AssetInfo, &asset);
     }
 
     pub fn unpause(env: Env, admin: Address) {
-        Self::require_initialized(&env);
-        admin.require_auth();
-        let mut asset: AssetInfo = env
-            .storage()
-            .instance()
-            .get(&DataKey::AssetInfo)
-            .unwrap();
+        Self::require_admin(&env, &admin);
+        let mut asset: AssetInfo = env.storage().instance().get(&DataKey::AssetInfo).unwrap();
         asset.paused = false;
         env.storage().instance().set(&DataKey::AssetInfo, &asset);
     }
@@ -170,7 +174,7 @@ impl RwaLaunchpad {
     pub fn invest(env: Env, investor: Address, payment_amount: i128) -> i128 {
         Self::require_initialized(&env);
         investor.require_auth();
-        if let Err(err) = Self::check_variation_gate(&env, &investor) {
+        if let Err(err) = Self::check_variation_gate(&env, &investor, payment_amount) {
             panic_with_error!(&env, err);
         }
         Self::require_not_paused(&env);
@@ -182,11 +186,7 @@ impl RwaLaunchpad {
             panic_with_error!(&env, Error::NotWhitelisted);
         }
 
-        let asset: AssetInfo = env
-            .storage()
-            .instance()
-            .get(&DataKey::AssetInfo)
-            .unwrap();
+        let asset: AssetInfo = env.storage().instance().get(&DataKey::AssetInfo).unwrap();
         if asset.price_per_unit <= 0 {
             panic_with_error!(&env, Error::InvalidAmount);
         }
@@ -197,11 +197,7 @@ impl RwaLaunchpad {
         }
 
         let token_client = token::Client::new(&env, &asset.payment_token);
-        token_client.transfer(
-            &investor,
-            &env.current_contract_address(),
-            &payment_amount,
-        );
+        token_client.transfer(&investor, &env.current_contract_address(), &payment_amount);
 
         Self::internal_mint(&env, &investor, rwa_amount);
         env.events().publish(
@@ -213,17 +209,12 @@ impl RwaLaunchpad {
     }
 
     pub fn withdraw(env: Env, admin: Address, to: Address, amount: i128) {
-        Self::require_initialized(&env);
-        admin.require_auth();
+        Self::require_admin(&env, &admin);
         if amount <= 0 {
             panic_with_error!(&env, Error::InvalidAmount);
         }
 
-        let asset: AssetInfo = env
-            .storage()
-            .instance()
-            .get(&DataKey::AssetInfo)
-            .unwrap();
+        let asset: AssetInfo = env.storage().instance().get(&DataKey::AssetInfo).unwrap();
         let contract = env.current_contract_address();
         let token_address = asset.payment_token.clone();
 

@@ -1,0 +1,35 @@
+   Compiling rwa-launchpad-dia-3 v0.1.0 (/private/tmp/rwa-week4-work/dia-3)
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> src/lib.rs:130:22
+    |
+130 |         env.events().publish((symbol_short!("mint"),), (to, amount));
+    |                      ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> src/lib.rs:150:14
+    |
+150 |             .publish((symbol_short!("transfer"),), (from, to, amount));
+    |              ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> src/lib.rs:203:22
+    |
+203 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: `rwa-launchpad-dia-3` (lib test) generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.81s
+     Running unittests src/lib.rs (target/debug/deps/rwa_launchpad_dia_3-75b7bd449b6cbafb)
+
+running 6 tests
+test test::test_other_signer_cannot_act_as_admin ... ok
+test test::test_invest_not_whitelisted - should panic ... ok
+test test::test_boundary_499_is_rejected ... ok
+test test::test_invest ... ok
+test test::test_minimum_investment_100_fails_500_succeeds ... ok
+test test::test_withdraw ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

@@ -1,0 +1,18 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><title>Inversión de 100 — rechazada</title>
+<style>body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui;padding:24px}
+h1{font-size:23px;margin:8px 0}p{color:#a9b9cf;font-size:14px}h2{font-size:14px;color:#8bd5ff;margin:12px 0 8px}
+pre{background:#172339;border:1px solid #334155;border-radius:8px;margin:0;padding:14px;font:13px/1.4 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+</style><body><p>STELLAR ELITE BOLIVIA · SEMANA 4 · TESTNET</p><h1>Inversión de 100 — rechazada</h1>
+<p>Registro original de Stellar CLI ejecutado mediante scripts/user-tool.sh. Vista de los archivos .log guardados.</p><h2>invest-100.log</h2><pre>
+=== INVERSIONISTA: invest 100 ===
+Contrato: CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532
+Inversionista: GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR
+$ stellar contract invoke --id CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532 --source rwa-investor --network testnet -- invest --investor GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR --payment_amount 100
+❌ error: transaction simulation failed: HostError: Error(Contract, #7)
+
+Event log (newest first):
+   0: [Diagnostic Event] contract:CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532, topics:[error, Error(Contract, #7)], data:&quot;escalating error to VM trap from failed host function call: fail_with_error&quot;
+   1: [Diagnostic Event] contract:CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532, topics:[error, Error(Contract, #7)], data:[&quot;failing with contract error&quot;, 7]
+   2: [Diagnostic Event] topics:[fn_call, CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532, invest], data:[GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR, 100]
+
+</pre></body></html>

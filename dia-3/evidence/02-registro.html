@@ -1,0 +1,22 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><title>Inversión de 500 — exitosa y balance RWA</title>
+<style>body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui;padding:24px}
+h1{font-size:23px;margin:8px 0}p{color:#a9b9cf;font-size:14px}h2{font-size:14px;color:#8bd5ff;margin:12px 0 8px}
+pre{background:#172339;border:1px solid #334155;border-radius:8px;margin:0;padding:14px;font:13px/1.4 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+</style><body><p>STELLAR ELITE BOLIVIA · SEMANA 4 · TESTNET</p><h1>Inversión de 500 — exitosa y balance RWA</h1>
+<p>Registro original de Stellar CLI ejecutado mediante scripts/user-tool.sh. Vista de los archivos .log guardados.</p><h2>invest-500.log</h2><pre>
+=== INVERSIONISTA: invest 500 ===
+Contrato: CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532
+Inversionista: GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR
+$ stellar contract invoke --id CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532 --source rwa-investor --network testnet -- invest --investor GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR --payment_amount 500
+ℹ️  Simulating transaction…
+ℹ️  Signing transaction: c8f18a335ef89ce7faa219215ec6681ff5fe22402b46a58d5376b0232d124d0a
+🌎 Sending transaction…
+✅ Transaction submitted successfully!
+🔗 https://stellar.expert/explorer/testnet/tx/c8f18a335ef89ce7faa219215ec6681ff5fe22402b46a58d5376b0232d124d0a
+📅 CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC - Success - Event: [{&quot;symbol&quot;:&quot;transfer&quot;},{&quot;address&quot;:&quot;GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR&quot;},{&quot;address&quot;:&quot;CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532&quot;},{&quot;string&quot;:&quot;native&quot;}] = {&quot;i128&quot;:&quot;500&quot;}
+📅 CCSC3NNDGHT4RQWGERZ7ZVCAWVNMBNJPOFU5CIGDUCY5N2PVMS7NT532 - Success - Event: [{&quot;symbol&quot;:&quot;invest&quot;}] = {&quot;vec&quot;:[{&quot;address&quot;:&quot;GC4L3NI5KW6LOOYKGOJBAP6HJKUW6XEMK7K44N3DH4XNBWHJDG4MKHGR&quot;},{&quot;i128&quot;:&quot;500&quot;},{&quot;i128&quot;:&quot;5&quot;}]}
+&quot;5&quot;
+</pre><h2>balance.log</h2><pre>=== INVERSIONISTA: balance RWA ===
+ℹ️  Simulation identified as read-only. Send by rerunning with `--send=yes`.
+&quot;5&quot;
+</pre></body></html>

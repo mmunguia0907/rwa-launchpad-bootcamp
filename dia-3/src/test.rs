@@ -81,3 +81,75 @@ fn test_invest_not_whitelisted() {
     env.mock_all_auths();
     client.invest(&investor, &500);
 }
+
+#[test]
+fn test_minimum_investment_100_fails_500_succeeds() {
+    let env = Env::default();
+    let (admin, payment_token, contract_id, client) = setup_with_payment_token(&env);
+    let investor = Address::generate(&env);
+    StellarAssetClient::new(&env, &payment_token).mint(&investor, &1_000);
+    let token = TokenClient::new(&env, &payment_token);
+    client.set_whitelist(&admin, &investor, &true);
+
+    assert_eq!(
+        client.try_invest(&investor, &100),
+        Err(Ok(Error::AmountTooLow.into()))
+    );
+    assert_eq!(client.balance(&investor), 0);
+    assert_eq!(token.balance(&investor), 1_000);
+    assert_eq!(token.balance(&contract_id), 0);
+
+    assert_eq!(client.invest(&investor, &500), 5);
+    assert_eq!(client.balance(&investor), 5);
+    assert_eq!(token.balance(&investor), 500);
+    assert_eq!(token.balance(&contract_id), 500);
+
+    // El mínimo aplica a CADA inversión, incluso después de una exitosa.
+    assert_eq!(
+        client.try_invest(&investor, &100),
+        Err(Ok(Error::AmountTooLow.into()))
+    );
+    assert_eq!(client.balance(&investor), 5);
+    assert_eq!(token.balance(&investor), 500);
+}
+
+#[test]
+fn test_boundary_499_is_rejected() {
+    let env = Env::default();
+    let (admin, payment_token, _, client) = setup_with_payment_token(&env);
+    let investor = Address::generate(&env);
+    StellarAssetClient::new(&env, &payment_token).mint(&investor, &1_000);
+    client.set_whitelist(&admin, &investor, &true);
+    assert_eq!(
+        client.try_invest(&investor, &499),
+        Err(Ok(Error::AmountTooLow.into()))
+    );
+    assert_eq!(client.balance(&investor), 0);
+}
+
+#[test]
+fn test_other_signer_cannot_act_as_admin() {
+    let env = Env::default();
+    let (_, _, _, client) = setup_with_payment_token(&env);
+    let attacker = Address::generate(&env);
+    assert_eq!(
+        client.try_set_whitelist(&attacker, &attacker, &true),
+        Err(Ok(Error::Unauthorized.into()))
+    );
+    assert_eq!(
+        client.try_mint(&attacker, &attacker, &100),
+        Err(Ok(Error::Unauthorized.into()))
+    );
+    assert_eq!(
+        client.try_withdraw(&attacker, &attacker, &500),
+        Err(Ok(Error::Unauthorized.into()))
+    );
+    assert_eq!(
+        client.try_pause(&attacker),
+        Err(Ok(Error::Unauthorized.into()))
+    );
+    assert_eq!(
+        client.try_unpause(&attacker),
+        Err(Ok(Error::Unauthorized.into()))
+    );
+}
